@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart CPU Process Scheduler</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Header / Sticky Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-title">CPU SCHEDULER</span>
+            </div>
+            <nav class="nav-links">
+                <a href="#scheduler" class="nav-link-item active" data-nav="scheduler">CPU Scheduler</a>
+                <a href="#visualization" class="nav-link-item" data-nav="visualization">DS Visualization</a>
+                <a href="#comparison" class="nav-link-item" data-nav="comparison">Algorithm Comparison</a>
+                <a href="#starvation" class="nav-link-item" data-nav="starvation">Starvation &amp; Aging</a>
+                <a href="#reference" class="nav-link-item" data-nav="reference">Theory &amp; Formulas</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <!-- Main Title Header -->
+        <div class="main-header">
+            <h1>SMART CPU PROCESS SCHEDULER</h1>
+            <p class="subtitle">CPU Scheduling Simulation &amp; Interactive Data Structures Visualization</p>
+        </div>
+
+        <!-- 🎛️ Primary View Management Tab Bar -->
+        <nav class="view-management-bar" aria-label="Module Navigation">
+            <div class="view-tabs" role="tablist">
+                <button type="button" class="tab-item active" data-tab="scheduler" role="tab" aria-selected="true">
+                    <span class="tab-badge">1</span>
+                    <span class="tab-title">CPU Scheduler &amp; Results</span>
+                </button>
+                <button type="button" class="tab-item" data-tab="visualization" role="tab" aria-selected="false">
+                    <span class="tab-badge">2</span>
+                    <span class="tab-title">Data Structures Visualization</span>
+                </button>
+                <button type="button" class="tab-item" data-tab="comparison" role="tab" aria-selected="false">
+                    <span class="tab-badge">3</span>
+                    <span class="tab-title">Algorithm Comparison</span>
+                </button>
+                <button type="button" class="tab-item" data-tab="starvation" role="tab" aria-selected="false">
+                    <span class="tab-badge">4</span>
+                    <span class="tab-title">Starvation &amp; Aging</span>
+                </button>
+                <button type="button" class="tab-item" data-tab="reference" role="tab" aria-selected="false">
+                    <span class="tab-badge">5</span>
+                    <span class="tab-title">Theory &amp; Formulas</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- ============================================================== -->
+        <!-- VIEW 1: CPU SCHEDULER & RESULTS                                -->
+        <!-- ============================================================== -->
+        <main class="view-panel active" id="view-scheduler">
+            
+            <!-- Section 1: Process Input -->
+            <section id="scheduler-section" class="card">
+                <div class="card-header">
+                    <h2>1. Enter Process Details</h2>
+                </div>
+                <div class="card-body">
+                    <div class="input-inline-group">
+                        <label for="num-processes"><strong>Number of Processes:</strong></label>
+                        <input type="number" id="num-processes" min="1" max="20" value="4">
+                        <button type="button" id="btn-add-processes" class="btn btn-primary">Add Processes</button>
+                        <button type="button" id="btn-load-example" class="btn btn-secondary">Load Example Data</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="process-input-table" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Process</th>
+                                    <th>Arrival Time (AT)</th>
+                                    <th>Burst Time (BT)</th>
+                                    <th>Priority (Lower = Higher)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="process-table-body">
+                                <!-- Dynamically generated rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Algorithm Selection -->
+            <section class="card">
+                <div class="card-header">
+                    <h2>2. Select Scheduling Algorithm</h2>
+                </div>
+                <div class="card-body">
+                    <div class="algo-buttons-container">
+                        <button type="button" class="btn-algo active" data-algo="fcfs">FCFS</button>
+                        <button type="button" class="btn-algo" data-algo="sjf">SJF Non-Preemptive</button>
+                        <button type="button" class="btn-algo" data-algo="srtf">SRTF</button>
+                        <button type="button" class="btn-algo" data-algo="rr">Round Robin</button>
+                        <button type="button" class="btn-algo" data-algo="priority-np">Priority Non-Preemptive</button>
+                        <button type="button" class="btn-algo" data-algo="priority-p">Priority Preemptive</button>
+                    </div>
+
+                    <!-- Quantum input for Round Robin only -->
+                    <div id="quantum-container" class="quantum-box" style="display: none;">
+                        <label for="time-quantum"><strong>Time Quantum:</strong></label>
+                        <input type="number" id="time-quantum" min="1" max="100" value="2">
+                    </div>
+
+                    <div class="action-buttons-center">
+                        <button type="button" id="btn-run" class="btn btn-success btn-large">Run Scheduler</button>
+                        <button type="button" id="btn-visualize-ds" class="btn btn-primary btn-large">⚡ Open Data Structures Visualization</button>
+                        <button type="button" id="btn-compare-all" class="btn btn-secondary">📊 Compare All Algorithms</button>
+                        <button type="button" id="btn-reset" class="btn btn-danger">Reset</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Scheduling Results & Main Gantt Chart -->
+            <section id="results-section" class="card" style="display: none;">
+                <div class="card-header">
+                    <h2>3. Scheduling Results</h2>
+                </div>
+                <div class="card-body">
+                    
+                    <div class="gantt-section">
+                        <h3>GANTT CHART</h3>
+                        <div id="gantt-chart-wrapper" class="gantt-wrapper">
+                            <!-- Dynamic Gantt chart blocks and time numbers -->
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table results-table">
+                            <thead>
+                                <tr>
+                                    <th>PID</th>
+                                    <th>Arrival Time (AT)</th>
+                                    <th>Burst Time (BT)</th>
+                                    <th>Priority</th>
+                                    <th>Completion Time (CT)</th>
+                                    <th>Turnaround Time (TAT)</th>
+                                    <th>Waiting Time (WT)</th>
+                                    <th>Response Time (RT)</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="results-table-body">
+                                <!-- Result rows -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Summary Metrics (including RT, CPU Util, Context Switches) -->
+                    <div class="metrics-summary">
+                        <div class="metric-item">
+                            <span class="metric-label">Average Waiting Time:</span>
+                            <span id="avg-wt-value" class="metric-value">0.00</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Average Turnaround Time:</span>
+                            <span id="avg-tat-value" class="metric-value">0.00</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">⏱️ Average Response Time:</span>
+                            <span id="avg-rt-value" class="metric-value">0.00</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">📊 CPU Utilization:</span>
+                            <span id="cpu-util-value" class="metric-value">100.0%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">🔄 Context Switches:</span>
+                            <span id="context-switch-value" class="metric-value">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Algorithm Information Box -->
+                    <div class="algo-info-card">
+                        <h4>Selected Algorithm: <span id="info-algo-name">FCFS</span></h4>
+                        <p><strong>Type:</strong> <span id="info-algo-type">Non-Preemptive</span></p>
+                        <p><strong>Description:</strong> <span id="info-algo-desc">Processes are executed in order of arrival.</span></p>
+                    </div>
+
+                    <!-- Quick Next-Steps Action Strip -->
+                    <div class="results-action-banner">
+                        <span>Inspect step-by-step memory movement or compare with other algorithms:</span>
+                        <div class="results-action-buttons">
+                            <button type="button" id="btn-results-to-ds" class="btn btn-primary btn-sm">🧠 View in Data Structures Visualizer</button>
+                            <button type="button" id="btn-results-to-comp" class="btn btn-secondary btn-sm">📊 Compare All Algorithms</button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+
+        <!-- ============================================================== -->
+        <!-- VIEW 2: DATA STRUCTURES VISUALIZATION                          -->
+        <!-- ============================================================== -->
+        <main class="view-panel" id="view-visualization" style="display: none;">
+            
+            <!-- Workload Context Strip -->
+            <div class="workload-context-bar">
+                <div class="context-details">
+                    <span>Workload: <strong id="ds-workload-count">4</strong> processes</span>
+                    <span class="context-divider">&bull;</span>
+                    <span>Selected Algorithm: <strong id="ds-workload-algo">FCFS</strong></span>
+                </div>
+                <button type="button" id="btn-edit-workload-quick" class="btn btn-secondary btn-sm">✏️ Edit Processes in Scheduler</button>
+            </div>
+
+            <!-- Visualization Main Card -->
+            <section id="ds-visualization-section" class="card">
+                <div class="card-header ds-header-flex">
+                    <div>
+                        <h2>Data Structures Visualization</h2>
+                        <span class="ds-subtitle">Interactive step-by-step memory, queue, CPU register &amp; log model</span>
+                    </div>
+                    <div class="ds-badge-container">
+                        <span id="ds-algo-badge" class="ds-badge">Algorithm: FCFS</span>
+                        <span id="ds-quantum-badge" class="ds-badge ds-badge-quantum" style="display: none;">Quantum: 2</span>
+                    </div>
+                </div>
+                <div class="card-body">
+
+                    <!-- Step-by-Step Simulation Controls -->
+                    <div class="ds-controls-panel">
+                        <div class="ds-controls-group">
+                            <button type="button" id="btn-sim-start" class="btn btn-primary btn-sm">▶ Start Simulation</button>
+                            <button type="button" id="btn-sim-pause" class="btn btn-secondary btn-sm" disabled>⏸ Pause</button>
+                            <button type="button" id="btn-sim-prev" class="btn btn-secondary btn-sm" disabled>⏮ Previous Step</button>
+                            <button type="button" id="btn-sim-next" class="btn btn-secondary btn-sm">⏭ Next Step</button>
+                            <button type="button" id="btn-sim-reset" class="btn btn-danger btn-sm">↺ Reset Simulation</button>
+                        </div>
+
+                        <div class="ds-speed-group">
+                            <span class="control-label">Speed:</span>
+                            <div class="speed-btn-group" role="group">
+                                <button type="button" class="btn-speed" data-speed="2000">0.5×</button>
+                                <button type="button" class="btn-speed active" data-speed="1000">1×</button>
+                                <button type="button" class="btn-speed" data-speed="500">2×</button>
+                                <button type="button" class="btn-speed" data-speed="250">4×</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Simulation Status Banner -->
+                    <div class="ds-status-banner">
+                        <div class="status-indicator">
+                            <span class="status-dot" id="ds-status-dot"></span>
+                            <span id="ds-status-text">Ready to simulate</span>
+                        </div>
+                        <div class="status-time">
+                            Simulation Time: <strong id="ds-current-time">T = 0</strong>
+                        </div>
+                        <div class="status-step-count">
+                            Step: <span id="ds-step-index">0</span> / <span id="ds-total-steps">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Explanation / Operation Narrative Card -->
+                    <div class="ds-explanation-box">
+                        <div class="ds-explanation-title">
+                            <strong>💡 Current Step Operation:</strong>
+                        </div>
+                        <p id="ds-step-explanation">Click <strong>"Start Simulation"</strong> or <strong>"Next Step"</strong> to inspect how the scheduler evaluates data structures at each simulation event.</p>
+                    </div>
+
+                    <!-- TOP ROW: CPU Execution Panel & Completed Processes -->
+                    <div class="ds-grid-two-col">
+                        <!-- C. CPU EXECUTION VISUALIZATION -->
+                        <div class="ds-card-sub ds-cpu-subpanel">
+                            <div class="ds-sub-header">
+                                <h3>C. CPU Execution Core</h3>
+                                <span class="ds-tag">Hardware Execution Register</span>
+                            </div>
+                            <div class="cpu-core-visual" id="cpu-core-box">
+                                <div class="cpu-chip-badge">CPU CORE 0</div>
+                                <div class="cpu-state-display" id="cpu-process-display">
+                                    <span class="cpu-state-title" id="cpu-state-title">IDLE</span>
+                                    <span class="cpu-state-detail" id="cpu-state-detail">No process running</span>
+                                </div>
+                                <div class="cpu-meta-grid">
+                                    <div class="cpu-meta-item">
+                                        <span class="meta-label">Current Time:</span>
+                                        <strong id="cpu-time-val">0</strong>
+                                    </div>
+                                    <div class="cpu-meta-item">
+                                        <span class="meta-label">Remaining BT:</span>
+                                        <strong id="cpu-remaining-val">-</strong>
+                                    </div>
+                                    <div class="cpu-meta-item">
+                                        <span class="meta-label">State:</span>
+                                        <span id="cpu-status-pill" class="pill-idle">IDLE</span>
+                                    </div>
+                                    <div class="cpu-meta-item" id="cpu-slice-meta" style="display: none;">
+                                        <span class="meta-label">Time Slice:</span>
+                                        <strong id="cpu-slice-val">0 / 2</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- D. COMPLETED PROCESSES -->
+                        <div class="ds-card-sub ds-completed-subpanel">
+                            <div class="ds-sub-header">
+                                <h3>D. Completed Processes</h3>
+                                <span class="ds-tag">Terminated List</span>
+                            </div>
+                            <div id="ds-completed-list" class="completed-chips-container">
+                                <span class="empty-state-text">No processes completed yet.</span>
+                            </div>
+                            <div class="completed-summary-bar">
+                                <span>Completed: <strong id="ds-completed-count">0</strong> / <span id="ds-total-procs-count">4</span></span>
+                                <span>CPU Busy: <strong id="ds-live-busy-time">0</strong> units</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- B. READY QUEUE VISUALIZATION -->
+                    <div class="ds-card-sub ds-queue-subpanel">
+                        <div class="ds-sub-header">
+                            <div>
+                                <h3>B. Ready Queue Visualization</h3>
+                                <span class="ds-data-structure-label" id="queue-ds-concept-label">Data Structure: FIFO Queue (Circular / Array-based <code>int queue[500]</code>)</span>
+                            </div>
+                            <div class="ds-queue-pointers">
+                                <span class="pointer-pill pointer-front">FRONT: <strong id="queue-front-idx">0</strong></span>
+                                <span class="pointer-pill pointer-rear">REAR: <strong id="queue-rear-idx">0</strong></span>
+                                <span class="pointer-pill pointer-len">Length: <strong id="queue-len-val">0</strong></span>
+                            </div>
+                        </div>
+
+                        <!-- Queue Track with FRONT and REAR markers -->
+                        <div class="queue-track-wrapper">
+                            <div class="queue-endpoint endpoint-front">
+                                <span class="endpoint-arrow">FRONT ──►</span>
+                                <span class="endpoint-sub">Next Dequeued</span>
+                            </div>
+                            <div class="queue-items-track" id="ds-queue-items-track">
+                                <span class="empty-queue-msg">[ Ready Queue is Empty: CPU Idle or process executing ]</span>
+                            </div>
+                            <div class="queue-endpoint endpoint-rear">
+                                <span class="endpoint-arrow">◄── REAR</span>
+                                <span class="endpoint-sub">New Arrivals Enqueued</span>
+                            </div>
+                        </div>
+
+                        <div class="queue-operation-explanation" id="ds-queue-op-text">
+                            <em>Queue operation:</em> Waiting for simulation events.
+                        </div>
+                    </div>
+
+                    <!-- A. ARRAY VISUALIZATION -->
+                    <div class="ds-card-sub ds-array-subpanel">
+                        <div class="ds-sub-header">
+                            <div>
+                                <h3>A. Process Array Visualization</h3>
+                                <span class="ds-data-structure-label" id="array-ds-label">Underlying Structure: Contiguous Struct Array <code>Process p[N]</code> (C++ Memory Layout)</span>
+                            </div>
+                            <span class="ds-tag">Contiguous Memory Allocation</span>
+                        </div>
+
+                        <p class="array-instructions-hint">
+                            Each element represents an entry in the processes array. Indices match zero-based array offsets <code>p[0..N-1]</code>.
+                        </p>
+
+                        <div class="array-container" id="ds-array-container">
+                            <!-- Populated dynamically with process element cards -->
+                        </div>
+                    </div>
+
+                    <!-- SYNCHRONIZED GANTT MINI STRIP (in DS section) -->
+                    <div class="ds-card-sub ds-sync-gantt-subpanel">
+                        <div class="ds-sub-header">
+                            <h3>Synchronized Gantt Timeline</h3>
+                            <span class="ds-tag">Active Segment Synchronized with Clock</span>
+                        </div>
+                        <div id="ds-sync-gantt-wrapper" class="gantt-wrapper ds-mini-gantt">
+                            <!-- Synchronized Gantt blocks -->
+                        </div>
+                    </div>
+
+                    <!-- 4. LIVE DATA STRUCTURE OPERATION LOG -->
+                    <div class="ds-card-sub ds-log-subpanel">
+                        <div class="ds-sub-header">
+                            <div>
+                                <h3>Data Structure Operation Log</h3>
+                                <span class="ds-data-structure-label">Chronological audit trail of enqueue, dequeue, array scan, and CPU events</span>
+                            </div>
+                            <div class="log-actions">
+                                <button type="button" id="btn-clear-log" class="btn btn-secondary btn-xs">Clear Filter</button>
+                            </div>
+                        </div>
+                        <div class="ds-log-stream" id="ds-log-stream">
+                            <div class="log-entry log-entry-info">
+                                <span class="log-time">[T=0]</span>
+                                <span class="log-badge badge-init">INIT</span>
+                                <span class="log-msg">Simulation initialized. Process records loaded into <code>Process p[4]</code> memory array.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+
+        <!-- ============================================================== -->
+        <!-- VIEW 3: ALGORITHM COMPARISON MATRIX                            -->
+        <!-- ============================================================== -->
+        <main class="view-panel" id="view-comparison" style="display: none;">
+            <section id="comparison-section" class="card">
+                <div class="card-header comparison-header-flex">
+                    <h2>Algorithm Comparison Matrix</h2>
+                    <button type="button" id="btn-refresh-comparison" class="btn btn-primary btn-sm">⚡ Re-calculate All Algorithms</button>
+                </div>
+                <div class="card-body">
+                    <p class="section-lead-text">
+                        Comparative analysis across all 6 scheduling algorithms on the exact same process workload:
+                    </p>
+
+                    <!-- Comparison Winner Cards -->
+                    <div class="comparison-cards-grid" id="comparison-winners-grid" style="display: none;">
+                        <div class="winner-card winner-wt">
+                            <div class="winner-icon">🏆</div>
+                            <div class="winner-text">
+                                <span class="winner-label">Lowest Avg Waiting Time:</span>
+                                <strong id="winner-wt-algo">SRTF</strong>
+                                <small id="winner-wt-val">0.00 units</small>
+                            </div>
+                        </div>
+                        <div class="winner-card winner-tat">
+                            <div class="winner-icon">⚡</div>
+                            <div class="winner-text">
+                                <span class="winner-label">Lowest Avg Turnaround:</span>
+                                <strong id="winner-tat-algo">SRTF</strong>
+                                <small id="winner-tat-val">0.00 units</small>
+                            </div>
+                        </div>
+                        <div class="winner-card winner-rt">
+                            <div class="winner-icon">⏱️</div>
+                            <div class="winner-text">
+                                <span class="winner-label">Fastest Response Time:</span>
+                                <strong id="winner-rt-algo">Round Robin</strong>
+                                <small id="winner-rt-val">0.00 units</small>
+                            </div>
+                        </div>
+                        <div class="winner-card winner-cs">
+                            <div class="winner-icon">🔄</div>
+                            <div class="winner-text">
+                                <span class="winner-label">Lowest Context Switches:</span>
+                                <strong id="winner-cs-algo">FCFS</strong>
+                                <small id="winner-cs-val">0 switches</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>Algorithm</th>
+                                    <th>Type</th>
+                                    <th>Avg Waiting (WT)</th>
+                                    <th>Avg Turnaround (TAT)</th>
+                                    <th>Avg Response (RT)</th>
+                                    <th>CPU Utilization</th>
+                                    <th>Context Switches</th>
+                                    <th>Execution Sequence</th>
+                                </tr>
+                            </thead>
+                            <tbody id="comparison-table-body">
+                                <tr>
+                                    <td colspan="8" style="color: #718096; padding: 18px;">
+                                        Loading comparative benchmark across all 6 algorithms...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="tradeoff-note-card">
+                        <strong>💡 Engineering Note on Algorithm Trade-offs:</strong>
+                        <p>No single algorithm is universally optimal. Preemptive algorithms such as SRTF reduce average waiting time by prioritizing shorter jobs, but incur higher context-switch overhead. Round Robin guarantees responsiveness and fairness for time-sharing systems, while FCFS maximizes throughput with minimal scheduling overhead.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- ============================================================== -->
+        <!-- VIEW 4: STARVATION & AGING DEMONSTRATION                       -->
+        <!-- ============================================================== -->
+        <main class="view-panel" id="view-starvation" style="display: none;">
+            <section id="starvation-aging-section" class="card">
+                <div class="card-header">
+                    <h2>Starvation &amp; Aging Demonstration (Priority Scheduling)</h2>
+                </div>
+                <div class="card-body">
+                    <p class="section-lead-text">
+                        An educational module explaining why low-priority processes can suffer from <strong>starvation</strong> (indefinite postponement) and how the <strong>aging technique</strong> solves it by gradually boosting priority over time.
+                    </p>
+
+                    <div class="starvation-options-bar">
+                        <button type="button" id="btn-load-starvation-workload" class="btn btn-primary btn-sm">Load Starvation Demonstration Workload</button>
+                        <div class="aging-toggle-group">
+                            <label class="toggle-checkbox-label">
+                                <input type="checkbox" id="chk-aging-mode">
+                                <strong>Enable Aging Mechanism (Optional Mode)</strong>
+                            </label>
+                            <span class="aging-rule-badge">Rule: Priority increases by 1 for every <strong>3 units</strong> waited in ready queue</span>
+                        </div>
+                    </div>
+
+                    <div class="starvation-grid">
+                        <!-- Column 1: Starvation Concept -->
+                        <div class="starvation-card-col">
+                            <div class="starvation-col-header starvation-warn-header">
+                                <h3>⚠️ Starvation Scenario</h3>
+                            </div>
+                            <div class="starvation-col-body">
+                                <p>In standard <strong>Priority Scheduling</strong>, if high-priority processes continually arrive, low-priority processes may never be dispatched to the CPU.</p>
+                                <div class="concept-stat-box" id="starvation-stat-box">
+                                    <div class="stat-row">
+                                        <span>Victim Process:</span>
+                                        <strong>P4 (Priority: 8 - Low Priority)</strong>
+                                    </div>
+                                    <div class="stat-row">
+                                        <span>Compromising Stream:</span>
+                                        <span>P1, P2, P3 (High Priorities 1, 2, 2)</span>
+                                    </div>
+                                    <div class="stat-row">
+                                        <span>Starvation Cause:</span>
+                                        <span>Strict priority dispatch without aging gives CPU only to higher priority jobs.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Column 2: Aging Solution -->
+                        <div class="starvation-card-col">
+                            <div class="starvation-col-header starvation-solution-header">
+                                <h3>🎯 Aging Solution</h3>
+                            </div>
+                            <div class="starvation-col-body">
+                                <p><strong>Aging</strong> gradually increments the effective priority of waiting processes as their wait time increases, ensuring they eventually reach top priority.</p>
+                                <div class="concept-stat-box" id="aging-stat-box">
+                                    <div class="stat-row">
+                                        <span>Original Priority:</span>
+                                        <strong id="demo-orig-priority">P4: Priority 8</strong>
+                                    </div>
+                                    <div class="stat-row">
+                                        <span>Aging Formula:</span>
+                                        <code>EffectivePriority = Max(1, Original - Floor(Wait / Interval))</code>
+                                    </div>
+                                    <div class="stat-row">
+                                        <span>Status in Current Run:</span>
+                                        <span id="demo-aging-status" class="status-neutral">Disabled (Enable checkbox above to simulate)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Starvation & Aging Process Tracker Table -->
+                    <div class="starvation-live-tracker" id="starvation-live-tracker" style="display: none;">
+                        <h4>Workload Aging &amp; Starvation Analysis Table</h4>
+                        <div class="table-responsive">
+                            <table class="data-table" id="starvation-table">
+                                <thead>
+                                    <tr>
+                                        <th>Process</th>
+                                        <th>Arrival</th>
+                                        <th>Burst</th>
+                                        <th>Original Priority</th>
+                                        <th>Waiting Time</th>
+                                        <th>Effective Priority</th>
+                                        <th>Starvation Risk</th>
+                                        <th>Aging Events</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="starvation-table-body">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </main>
+
+        <!-- ============================================================== -->
+        <!-- VIEW 5: THEORY & FORMULAS REFERENCE                            -->
+        <!-- ============================================================== -->
+        <main class="view-panel" id="view-reference" style="display: none;">
+            <section id="algorithms-section" class="card">
+                <div class="card-header">
+                    <h2>Algorithm Descriptions &amp; Standard Formulas</h2>
+                </div>
+                <div class="card-body">
+                    <div class="reference-grid">
+                        <div class="ref-item">
+                            <strong>FCFS (First Come First Serve):</strong>
+                            <p>Processes are executed in order of arrival. Non-preemptive. Simple FIFO ordering.</p>
+                        </div>
+                        <div class="ref-item">
+                            <strong>SJF (Shortest Job First):</strong>
+                            <p>The arrived process with the shortest burst time is selected first. Non-preemptive.</p>
+                        </div>
+                        <div class="ref-item">
+                            <strong>SRTF (Shortest Remaining Time First):</strong>
+                            <p>The arrived process with the shortest remaining burst time is selected. Preemptive SJF.</p>
+                        </div>
+                        <div class="ref-item">
+                            <strong>Round Robin (RR):</strong>
+                            <p>Each process gets CPU time according to the time quantum. Preempted processes re-enter the rear of the ready queue.</p>
+                        </div>
+                        <div class="ref-item">
+                            <strong>Priority Non-Preemptive:</strong>
+                            <p>The available process with the highest priority (lowest numeric value) is selected and runs to completion.</p>
+                        </div>
+                        <div class="ref-item">
+                            <strong>Priority Preemptive:</strong>
+                            <p>A higher priority process arriving during execution immediately interrupts and preempts the running process.</p>
+                        </div>
+                    </div>
+
+                    <div class="formulas-box">
+                        <strong>Standard Operating Systems Formulas:</strong>
+                        <ul>
+                            <li><code>Turnaround Time (TAT) = Completion Time (CT) - Arrival Time (AT)</code></li>
+                            <li><code>Waiting Time (WT) = Turnaround Time (TAT) - Burst Time (BT)</code></li>
+                            <li><code>Response Time (RT) = Time of First Execution - Arrival Time (AT)</code></li>
+                            <li><code>Average Waiting Time = (Σ WT) / N</code></li>
+                            <li><code>Average Turnaround Time = (Σ TAT) / N</code></li>
+                            <li><code>CPU Utilization = (Total Busy Time / Total Timeline) × 100%</code></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Smart CPU Process Scheduler &bull; Interactive Data Structures &amp; OS Simulator</p>
+        </footer>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
